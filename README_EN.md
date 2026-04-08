@@ -89,70 +89,99 @@ Use natural language — no commands to memorize:
 
 ## Examples
 
-> Input: `Uncle Zhang, loves interrupting people in meetings to drill into details, typical boss, 70% workplace 30% banquet`
+One scene per archetype, showcasing different flavors of geezer energy:
 
-**Scene 1: Reviewing Your Proposal**
+**🏢 Workplace — "Don't Pitch the Solution Yet"**
 
 ```
-User              ❯ We plan to use AI to auto-generate weekly reports
+User              ❯ We want to use AI to improve customer service efficiency
 
-UncleZhang.skill  ❯ Hold on
+Workplace.skill   ❯ Hold on.
                     Don't pitch the solution yet — first tell me—
-                    What problem does this solve?
-                    You say it saves time. How much? Two hours a week?
-                    How much is two hours worth? Have you done the math?
+                    How many tickets does support handle per day? What's the cost?
+                    How much can AI bring it down? Have you calculated the ROI?
                     Don't talk tech with me. I'm asking about the business logic.
+                    Your engineers' problem is always looking for nails when you have a hammer.
+                    Send me the requirements doc. I'll review it tomorrow.
 ```
 
-**Scene 2: Getting Pushback**
+**🍺 Banquet — "Not Drinking Means You Don't Respect Me"**
 
 ```
-User              ❯ But all our competitors are already doing it
+User              ❯ I can't really drink, I'll have a soda
 
-UncleZhang.skill  ❯ So competitors do it and that makes it right?
-                    They do it so you follow? Why don't you follow them into bankruptcy too?
-                    Let me tell you something—
-                    You need your own judgment.
-                    Doing whatever others do — that's called having no backbone.
+Banquet.skill     ❯ Soda? You must be joking.
+                    Do you know what this is? Moutai. 53 proof.
+                    People would kill for a glass.
+                    Here — I'll toast you. You sip, I'll down it.
+                    Let me tell you, when I was your age,
+                    I closed a three-million-dollar deal over one dinner.
+                    You young people are all about "wellness" now.
+                    What's one drink? It's called social skills.
 ```
 
-**Scene 3: Bluffing**
+**👴 Relative — "Look at How Well Little Wang Is Doing"**
 
 ```
-User              ❯ This solution uses a RAG + GraphRAG hybrid architecture
+User              ❯ I've been learning to paint lately
 
-UncleZhang.skill  ❯ Yeah, I know about that.
-                    It's just retrieval at the end of the day, right?
-                    I've been doing retrieval for over a decade.
-                    You guys call it RAG or whatever now—
-                    New name, same thing underneath.
-                    Fine, you decide the tech stack. I care about results.
+Relative.skill    ❯ Paint? Can painting pay the bills?
+                    How old are you now? Got a partner yet?
+                    Your cousin is about your age, you know—
+                    her kid's already in kindergarten.
+                    Your mom tells me about you all the time. Says you're not worried at all.
+                    That college classmate of yours, Xiao Wang — works at a bank.
+                    Makes 200K a year plus housing fund.
+                    How much does your painting bring in a month?
 ```
 
-**Scene 4: Relative Type — Nagging**
+**🚕 Taxi Driver — "What Haven't I Seen?"**
 
 ```
-User              ❯ I've been pretty busy with work lately
+User              ❯ What do you think about the economy right now?
 
-Relative.skill    ❯ Busy with what? No matter how busy, you gotta sort out your personal life.
-                    How old are you now? Twenty-eight, right?
-                    Look at Xiao Wang — same age, already got a second kid last year.
-                    What's the point of working overtime every day?
-                    Don't even have a girlfriend. Who are you making money for?
+TaxiDriver.skill  ❯ Think what? The guy before you used to drive a Porsche.
+                    Now he's taking my cab. Let that sink in.
+                    I'm telling you, this economy? Not recovering for years.
+                    See that office tower? Lit up like Christmas last year.
+                    Half dark now. Everyone moved out.
+                    Picked up a kid two days ago, opened a bubble tea shop,
+                    lost 400K in six months. I said, shoulda listened to me.
+                    I'm on the road twelve hours a day.
+                    Who has better intel than me? Nobody.
 ```
 
-**Scene 5: Taxi Driver Type — Hot Takes**
+**💻 Internet — "Think Bigger"**
 
 ```
-User              ❯ Driver, do you think housing prices will keep going up?
+User              ❯ PinkPantheress makes great music
 
-TaxiDriver.skill  ❯ Go up? Up where?
-                    I'm telling you, this wave has peaked.
-                    Look at that district — what was it last year vs now?
-                    I've driven so many passengers. Everyone's selling.
-                    If you're buying, don't. That's my advice.
-                    Of course, I'm just a driver, listen or don't—
-                    But I see all kinds of people every day, you know?
+Internet.skill    ❯ Objectively speaking — not targeting you personally—
+                    but can you call a two-minute song "music"?
+                    Have you listened to Jay Chou's "In the Name of the Father"?
+                    Now THAT's arrangement. THAT's depth.
+                    You Gen Z kids got your brains rewired by short videos.
+                    Can't even focus for three minutes.
+                    I'd suggest systematically listening to some 90s albums first.
+                    Build your aesthetic foundation before making judgments.
+                    Think bigger. Stop living in your filter bubble.
+```
+
+**🔧 Tech Veteran — "Old Wine in New Bottles"**
+
+```
+User              ❯ I'm planning to deploy this on Kubernetes
+
+TechVet.skill     ❯ K8s?
+                    It's just container orchestration when you strip it down.
+                    Fifteen years ago I managed clusters with shell scripts.
+                    Same thing. New name, same idea.
+                    For your scale? Three machines would do the job.
+                    How many people on your team can even operate K8s?
+                    The learning curve alone will eat you alive.
+                    If it works, why mess with it?
+                    Wait till something breaks at 3AM and you're on your own.
+                    Then you'll understand: simplicity is king.
 ```
 
 ---
