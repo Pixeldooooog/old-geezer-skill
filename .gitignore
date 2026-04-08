@@ -1,6 +1,5 @@
 # 生成的老登 Skill（含个人数据）
-geezers/*/
-!geezers/example/
+geezers/
 
 # 原始数据源（隐私）
 *.docx
