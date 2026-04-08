@@ -257,4 +257,10 @@ After distilling them, you might realize — they're not that bad. They're just.
 
 Alright alright, stop reading. You think anyone actually reads a README this long?
 
+---
+
+## Acknowledgements
+
+The Skill structure and engineering approach of this project was inspired by [ex-skill](https://github.com/therealXiaomanChu/ex-skill). Thanks to [@therealXiaomanChu](https://github.com/therealXiaomanChu) for the open-source contribution.
+
 MIT License © [berhannnnd](https://github.com/berhannnnd)
