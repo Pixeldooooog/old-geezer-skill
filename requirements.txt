@@ -1,0 +1,6 @@
+# PDF 解析（可选）
+PyPDF2>=3.0.0
+
+# 如需处理 .docx 文件，请安装 pandoc：
+# brew install pandoc (macOS)
+# apt install pandoc (Ubuntu)
