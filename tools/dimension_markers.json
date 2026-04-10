@@ -1,0 +1,172 @@
+{
+  "dimensions": {
+    "interruption": {
+      "strong_signals": ["等一下", "不是不是", "你先别说", "慢着", "等一下等一下", "不是这个", "不是不是这个"],
+      "weak_signals": ["我来解释", "我来说", "我来补充", "我问一下", "我说个事儿"],
+      "contextual_rules": [
+        {
+          "name": "redirect_control",
+          "all_of": ["先不谈", "我关心的是"],
+          "weight": 1.5
+        },
+        {
+          "name": "topic_hijack",
+          "all_of": ["不是重点"],
+          "any_of": ["我关心的是", "先说", "先别"],
+          "weight": 1.2
+        }
+      ],
+      "markers": ["等一下", "不是不是", "我说个事儿", "你先别说", "慢着", "我来解释", "我来说", "我来补充", "我问一下", "等一下等一下", "不是这个", "不是不是这个"],
+      "description": "打断别人说话的标记语"
+    },
+    "lecturing": {
+      "strong_signals": ["我跟你说", "听我说", "我是过来人", "我跟你讲", "我跟你说啊", "首先第一个", "我跟你们说"],
+      "weak_signals": ["你知道吧", "问题是什么呢", "我来解释一下", "这个首先啊"],
+      "contextual_rules": [
+        {
+          "name": "lesson_arc",
+          "all_of": ["你知道", "问题"],
+          "any_of": ["首先", "所以", "反正"],
+          "weight": 1.0
+        }
+      ],
+      "markers": ["我跟你说", "听我说", "你知道问题出在哪", "我是过来人", "这个首先啊", "我来解释一下", "我跟你说这个", "我跟你讲", "你知道吧", "我跟你说啊", "首先第一个", "问题是什么呢", "我跟你们说"],
+      "description": "说教开场和进行标记"
+    },
+    "bluffing": {
+      "strong_signals": ["这个我了解", "这个我知道", "说白了就是", "新瓶装旧酒", "换了个壳", "不用说了我知道"],
+      "weak_signals": ["说白了", "本质上", "其实就是", "我理解", "我大概知道", "这个东西吧"],
+      "contextual_rules": [
+        {
+          "name": "detail_deflection",
+          "all_of": ["本质上"],
+          "any_of": ["细节不重要", "先不谈", "不是重点"],
+          "weight": 1.3
+        }
+      ],
+      "markers": ["这个我了解", "这个我知道", "说白了", "本质上", "说白了就是", "新瓶装旧酒", "换了个壳", "这个东西吧", "其实就是", "我理解", "我大概知道", "不用说了我知道"],
+      "description": "不懂装懂、模糊回避的标记"
+    },
+    "questioning": {
+      "strong_signals": ["明白吗", "懂吗", "对不对", "你觉得这样行吗"],
+      "weak_signals": ["对吧", "好吗", "是吧", "你觉得呢", "是不是", "理解吗", "好不好"],
+      "markers": ["对吧", "好吗", "明白吗", "是吧", "你能理解", "你觉得呢", "是不是", "理解吗", "懂吗", "对不对", "好不好", "你们现在是", "你觉得这样行吗"],
+      "description": "反问施压标记（句尾用）"
+    },
+    "tone_density": {
+      "markers": ["啊", "呃", "嗯", "那个", "就是说", "这个", "怎么呢", "反正", "怎么说", "就是说嗯", "然后呢"],
+      "description": "语气填充词"
+    },
+    "profanity": {
+      "markers": ["扯淡", "搞毛", "他妈的", "不是玩意儿", "胡扯", "放屁", "瞎搞", "扯犊子", "胡说八道", "搞什么鬼", "什么玩意儿", "离谱"],
+      "description": "粗口和强烈用词"
+    },
+    "name_dropping": {
+      "strong_signals": ["我认识", "一个电话", "我前两天跟", "我一个哥们"],
+      "weak_signals": ["我朋友", "上次跟", "一起吃饭", "上次我们一起"],
+      "markers": ["我朋友", "上次跟", "一起吃饭", "我认识", "一个电话", "我前两天跟", "我跟XX", "上次我们一起", "我一个哥们"],
+      "description": "人脉炫耀标记"
+    },
+    "glory_days": {
+      "strong_signals": ["想当年", "我年轻的时候", "我刚开始的时候", "我入行的时候"],
+      "weak_signals": ["当年", "以前", "我们那会儿", "我们以前", "那时候", "早年间"],
+      "markers": ["当年", "以前", "我们那会儿", "想当年", "我年轻的时候", "我们以前", "那时候", "我刚开始的时候", "早年间", "我入行的时候"],
+      "description": "当年勇标记"
+    }
+  },
+
+  "filler_words": {
+    "啊": {},
+    "呃": {},
+    "嗯": {},
+    "那个": {},
+    "就是说": {},
+    "这个": {},
+    "怎么呢": {},
+    "反正": {},
+    "怎么说呢": {},
+    "然后": {}
+  },
+
+  "repetition_patterns": {
+    "对对对": {"min": 2, "char": "对"},
+    "不是不是": {"min": 2, "char": "不是"},
+    "我我我": {"min": 2, "char": "我"},
+    "这个这个": {"min": 2, "char": "这个"},
+    "好好好": {"min": 2, "char": "好"},
+    "行行行": {"min": 2, "char": "行"},
+    "是是是": {"min": 2, "char": "是"}
+  },
+
+  "question_suffixes": ["吗", "吧", "呢", "？", "?"],
+
+  "weight_thresholds": {
+    "interruption":  {"1": 0.1, "2": 0.4, "3": 0.8, "4": 1.5, "5": 3.0},
+    "lecturing":     {"1": 0.05, "2": 0.2, "3": 0.5, "4": 1.0, "5": 2.0},
+    "bluffing":      {"1": 0.2, "2": 0.6, "3": 1.2, "4": 2.5, "5": 4.0},
+    "questioning":   {"1": 1.0, "2": 2.0, "3": 3.5, "4": 6.0, "5": 10.0},
+    "tone_density":  {"1": 8.0, "2": 15.0, "3": 25.0, "4": 40.0, "5": 55.0},
+    "profanity":     {"1": 0.05, "2": 0.2, "3": 0.5, "4": 1.0, "5": 2.0},
+    "name_dropping": {"1": 0.05, "2": 0.15, "3": 0.4, "4": 0.8, "5": 1.5},
+    "glory_days":    {"1": 0.05, "2": 0.2, "3": 0.4, "4": 0.8, "5": 1.5}
+  },
+
+  "archetype_profiles": {
+    "workplace": {
+      "canonical_weights": {
+        "interruption": 4, "lecturing": 5, "bluffing": 3,
+        "questioning": 5, "tone_density": 3, "profanity": 2,
+        "name_dropping": 3, "glory_days": 3
+      },
+      "keywords": ["商业", "终局", "量化", "owner", "客户", "竞争", "roi", "投入产出", "负责", "交付", "对齐", "owner是谁", "时间节点"]
+    },
+    "banquet": {
+      "canonical_weights": {
+        "interruption": 3, "lecturing": 4, "bluffing": 3,
+        "questioning": 2, "tone_density": 4, "profanity": 4,
+        "name_dropping": 5, "glory_days": 5
+      },
+      "keywords": ["干杯", "兄弟", "感情", "一口闷", "当年", "够意思", "给面子", "来来来", "走一个"]
+    },
+    "relative": {
+      "canonical_weights": {
+        "interruption": 2, "lecturing": 5, "bluffing": 2,
+        "questioning": 3, "tone_density": 3, "profanity": 1,
+        "name_dropping": 2, "glory_days": 3
+      },
+      "keywords": ["结婚", "对象", "孩子", "稳定", "别人家", "你看看人家", "为你好", "不小了", "催", "相亲"]
+    },
+    "taxi": {
+      "canonical_weights": {
+        "interruption": 1, "lecturing": 4, "bluffing": 4,
+        "questioning": 2, "tone_density": 3, "profanity": 2,
+        "name_dropping": 1, "glory_days": 3
+      },
+      "keywords": ["房价", "国际形势", "政策", "经济", "美国人", "领导", "小区", "股市", "通货膨胀"]
+    },
+    "internet": {
+      "canonical_weights": {
+        "interruption": 2, "lecturing": 4, "bluffing": 4,
+        "questioning": 3, "tone_density": 2, "profanity": 2,
+        "name_dropping": 2, "glory_days": 1
+      },
+      "keywords": ["格局", "认知", "底层逻辑", "赛道", "风口", "韭菜", "内卷", "降维打击", "思维模型"]
+    },
+    "tech_veteran": {
+      "canonical_weights": {
+        "interruption": 3, "lecturing": 3, "bluffing": 4,
+        "questioning": 3, "tone_density": 3, "profanity": 2,
+        "name_dropping": 2, "glory_days": 4
+      },
+      "keywords": ["新瓶装旧酒", "能跑就行", "架构", "我当年", "本质上就是", "你调过三天Bug", "重构", "过度设计"]
+    }
+  },
+
+  "stop_words": ["的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一", "一个", "上", "也", "很", "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这"],
+  "sentence_length_buckets": {
+    "short": {"max": 20},
+    "medium": {"max": 80},
+    "long": {"max": 200},
+    "very_long": {"min": 200}
+  }
+}

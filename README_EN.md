@@ -25,7 +25,7 @@ and generate an **AI Skill that truly sounds like them** — lectures you with t
 
 Send this to your AI (Claude Code / Codex / OpenClaw / any skill-compatible platform):
 
-> Please install the old-geezer skill: clone from https://github.com/berhannnnd/old-geezer-skill into your skills directory. This is a tool that distills "old geezers" into AI Skills, with 6 built-in archetypes (workplace / banquet / relative / taxi driver / internet / tech veteran), and supports custom distillation from real-world materials. Let me know when done.
+> Please install the old-geezer skill: clone from https://github.com/Pixeldooooog/old-geezer-skill into your skills directory. This is a tool that distills "old geezers" into AI Skills, with 6 built-in archetypes (workplace / banquet / relative / taxi driver / internet / tech veteran), and supports custom distillation from real-world materials. Let me know when done.
 
 ### Manual Installation
 
@@ -34,16 +34,16 @@ Send this to your AI (Claude Code / Codex / OpenClaw / any skill-compatible plat
 ```bash
 # Install to current project
 mkdir -p .claude/skills
-git clone https://github.com/berhannnnd/old-geezer-skill .claude/skills/create-geezer
+git clone https://github.com/Pixeldooooog/old-geezer-skill .claude/skills/create-geezer
 
 # Or install globally
-git clone https://github.com/berhannnnd/old-geezer-skill ~/.claude/skills/create-geezer
+git clone https://github.com/Pixeldooooog/old-geezer-skill ~/.claude/skills/create-geezer
 ```
 
 **VS Code Copilot**
 
 ```bash
-git clone https://github.com/berhannnnd/old-geezer-skill ~/.agents/skills/old-geezer
+git clone https://github.com/Pixeldooooog/old-geezer-skill ~/.agents/skills/old-geezer
 ```
 
 ### Dependencies (Optional)
@@ -292,4 +292,4 @@ Alright alright, stop reading. You think anyone actually reads a README this lon
 
 The Skill structure and engineering approach of this project was inspired by [ex-skill](https://github.com/therealXiaomanChu/ex-skill). Thanks to [@therealXiaomanChu](https://github.com/therealXiaomanChu) for the open-source contribution.
 
-MIT License © [berhannnnd](https://github.com/berhannnnd)
+MIT License © [Pixeldooooog](https://github.com/Pixeldooooog)

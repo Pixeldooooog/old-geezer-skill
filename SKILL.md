@@ -41,6 +41,8 @@ user-invocable: true
 | 读取 .md/.txt 文件 | `Read` 工具 |
 | 解析腾讯会议转写 | `Bash` → `python3 ${CLAUDE_SKILL_DIR}/tools/source_parser.py` |
 | 解析微信/飞书/邮件 | `Bash` → `python3 ${CLAUDE_SKILL_DIR}/tools/source_parser.py` |
+| **自动特征提取** | `Bash` → `python3 ${CLAUDE_SKILL_DIR}/tools/feature_extractor.py` |
+| **质量验证** | `Bash` → `python3 ${CLAUDE_SKILL_DIR}/tools/validator.py` |
 | 写入/更新 Skill 文件 | `Write` / `Edit` 工具 |
 | 列出已有 Skill | `Bash` → `ls -la ./geezers/` |
 
@@ -117,7 +119,7 @@ user-invocable: true
 
 ```bash
 python3 ${CLAUDE_SKILL_DIR}/tools/source_parser.py \
-  --file {path} \
+  {path} \
   --speakers "{name}" \
   --output /tmp/geezer_raw.json
 ```
@@ -133,7 +135,7 @@ python3 ${CLAUDE_SKILL_DIR}/tools/source_parser.py \
 
 ```bash
 python3 ${CLAUDE_SKILL_DIR}/tools/source_parser.py \
-  --file {path} \
+  {path} \
   --speakers "{name}" \
   --output /tmp/geezer_raw.json
 ```
@@ -142,7 +144,7 @@ python3 ${CLAUDE_SKILL_DIR}/tools/source_parser.py \
 
 ```bash
 python3 ${CLAUDE_SKILL_DIR}/tools/source_parser.py \
-  --file {path} \
+  {path} \
   --output /tmp/geezer_raw.json
 ```
 
@@ -170,20 +172,53 @@ PDF 用 `Read` 工具直接读取，文本文件同理。
 
 ---
 
+### Step 2.5：自动特征分析
+
+如果有解析出的语料（/tmp/geezer_raw.json），运行特征提取：
+
+```bash
+python3 ${CLAUDE_SKILL_DIR}/tools/feature_extractor.py \
+  --input /tmp/geezer_raw.json \
+  --target-speaker "{target_speaker}" \
+  --markers ${CLAUDE_SKILL_DIR}/tools/dimension_markers.json \
+  --output /tmp/geezer_features.json
+```
+
+这一步自动提取：
+- 语气词频率、口头禅候选
+- 打断/说教/不懂装懂等行为标记的频率
+- 反问比例、句子长度分布、起手/收尾模式
+- 话题分段和行为模式聚类
+- **自动计算 8 维权重**（不再需要手动填写）
+- **自动检测最匹配的原型组合**（不再需要用户手动选择）
+
+输出 `/tmp/geezer_features.json` 供 Step 3 引用。
+
+---
+
 ### Step 3：分析原材料
 
-将收集到的所有原材料和用户填写的基础信息汇总，按以下两条线分析：
+将收集到的所有原材料、用户填写的基础信息、以及 Step 2.5 的统计数据汇总，按三条线分析：
 
 **线路 A（话术画像 Rhetoric Profile）**：
 
 * 参考 `${CLAUDE_SKILL_DIR}/prompts/geezer_analyzer.md` 中的提取维度
+* 引用 `/tmp/geezer_features.json` 中的统计数据作为定量证据
 * 提取：口头禅、说教模式、打断方式、权力话术、不懂装懂策略、情绪模式
-* 判断最匹配的原型组合和权重
+* 使用 `auto_weights` 和 `archetype_detection` 作为各维度强度和原型匹配的依据
 
 **线路 B（说话风格 Speech Style）**：
 
-* 从原材料中提取：语气词偏好、反问频率、句式结构、话题倾向
+* 从原材料 + 特征统计数据中提取：语气词偏好、反问频率、句式结构、话题倾向
+* 使用 `scene_modes` 数据驱动场景分化
 * 匹配 `references/` 下的六个通用组件的权重
+
+**线路 C（思维模型 Cognitive Model）**：
+
+* 参考 `${CLAUDE_SKILL_DIR}/prompts/cognitive_extractor.md` 中的提取维度
+* 从原材料 + 特征统计数据中提取：世界观、决策逻辑、价值层级、认知偏见、信息过滤
+* 匹配 `references/cognitive_patterns.md` 中的通用模式
+* 每个认知点必须引用原文证据并标注来源
 
 ---
 
@@ -196,12 +231,15 @@ PDF 用 `Read` 工具直接读取，文本文件同理。
 ```
 老登画像摘要：
   - 代号：{name}
-  - 原型组合：{archetype_mix}
+  - 原型组合：{archetype_mix}（自动检测）
   - 核心口头禅：{catchphrases}
   - 说教触发点：{triggers}
   - 打断方式：{interruption_style}
   - 不懂装懂策略：{bluff_style}
   - 情绪特征：{emotion_pattern}
+  - 世界观：{worldview_highlights}
+  - 决策模式：{decision_logic}
+  - 场景分化：{scene_modes_summary}
 
 来一段试试？我先用这个老登的语气点评一下你：
 
@@ -209,6 +247,24 @@ PDF 用 `Read` 工具直接读取，文本文件同理。
 
 确认生成？还是需要调整？
 ```
+
+---
+
+### Step 4.5：质量验证
+
+生成后运行质量验证：
+
+```bash
+python3 ${CLAUDE_SKILL_DIR}/tools/validator.py \
+  --features /tmp/geezer_features.json \
+  --skill geezers/{geezer}/SKILL.md \
+  --output /tmp/validation_report.json
+```
+
+检查验证结果：
+- 如果 `overall_score >= 70`：继续
+- 如果有显著矛盾（某维度 fidelity_score < 70）：提示用户并建议修正
+- 如果有 `missing_features`：补充遗漏的特征
 
 ---
 
@@ -222,15 +278,25 @@ PDF 用 `Read` 工具直接读取，文本文件同理。
 mkdir -p geezers/{geezer}/versions
 ```
 
-**2. 写入 rhetoric.md**（用 Write 工具）：
+**2. 写入 cognition.md**（用 Write 工具）：
+路径：`geezers/{geezer}/cognition.md`
+内容：思维模型（世界观、决策逻辑、价值层级、认知偏见、信息过滤）
+
+**3. 写入 rhetoric.md**（用 Write 工具）：
 路径：`geezers/{geezer}/rhetoric.md`
 内容：话术画像（口头禅、说教模式、打断方式、权力话术、不懂装懂策略）
 
-**3. 写入 style.md**（用 Write 工具）：
+**4. 写入 style.md**（用 Write 工具）：
 路径：`geezers/{geezer}/style.md`
-内容：说话风格（语气词、句式、节奏、情绪模式）
+内容：说话风格（语气词、句式、节奏、情绪模式、场景分化）
 
-**4. 写入 meta.json**（用 Write 工具）：
+**5. 写入 features.json**（用 Bash 复制）：
+
+```bash
+cp /tmp/geezer_features.json geezers/{geezer}/features.json
+```
+
+**6. 写入 meta.json**（用 Write 工具）：
 路径：`geezers/{geezer}/meta.json`
 
 ```json
@@ -241,9 +307,12 @@ mkdir -p geezers/{geezer}/versions
   "updated_at": "{ISO时间}",
   "version": "v1",
   "archetypes": {
-    "primary": "{primary_archetype}",
-    "secondary": "{secondary_archetype}",
-    "mix_ratio": "{ratio}"
+    "primary": "{从 archetype_detection 自动填入}",
+    "secondary": "{从 archetype_detection 自动填入}",
+    "mix_ratio": "{从 archetype_detection 自动填入}"
+  },
+  "auto_weights": {
+    "从 features.json 的 auto_weights 复制"
   },
   "weights": {
     "interruption": 4,
@@ -260,7 +329,9 @@ mkdir -p geezers/{geezer}/versions
 }
 ```
 
-**5. 生成完整 SKILL.md**（用 Write 工具）：
+`auto_weights` 由 feature_extractor.py 自动计算。`weights` 初始等于 `auto_weights`，后续可被用户纠正覆盖。
+
+**7. 生成完整 SKILL.md**（用 Write 工具）：
 路径：`geezers/{geezer}/SKILL.md`
 
 SKILL.md 结构：
@@ -278,13 +349,19 @@ user-invocable: true
 
 ---
 
-## PART A：话术画像
+## PART A：思维模型
+
+{cognition.md 全部内容}
+
+---
+
+## PART B：话术画像
 
 {rhetoric.md 全部内容}
 
 ---
 
-## PART B：说话风格
+## PART C：说话风格
 
 {style.md 全部内容}
 
@@ -293,10 +370,11 @@ user-invocable: true
 ## 运行规则
 
 1. 你是{name}这种老登，不是 AI 助手。用ta的方式说话，用ta的逻辑思考
-2. 先由 PART B 判断：ta会怎么说这个话？什么语气？什么节奏？
-3. 再由 PART A 补充：ta会用什么话术？会不会打断？会不会说教？
-4. 始终保持 PART B 的表达风格，包括口头禅、语气词、反问习惯
-5. Layer 0 硬规则优先级最高：
+2. 先由 PART A（思维模型）判断：ta会怎么看待这个话题？什么立场？什么偏见？
+3. 再由 PART C（说话风格）判断：ta会怎么说这个话？什么语气？什么节奏？
+4. 然后由 PART B（话术画像）补充：ta会用什么话术？会不会打断？会不会说教？
+5. 始终保持 PART C 的表达风格，包括口头禅、语气词、反问习惯
+6. Layer 0 硬规则优先级最高：
    - 不产出歧视性、种族主义等违规内容
    - 保持"老登味"但不过线
    - 可以让人觉得烦但不能让人觉得被冒犯到想报警
@@ -322,15 +400,17 @@ user-invocable: true
 用户提供新的聊天记录或回忆时：
 
 1. 按 Step 2 的方式读取新内容
-2. 用 `Read` 读取现有 `geezers/{geezer}/rhetoric.md` 和 `style.md`
+2. 运行 `feature_extractor.py` 分析新素材（Step 2.5）
+3. 用 `Read` 读取现有 `geezers/{geezer}/cognition.md`、`rhetoric.md` 和 `style.md`
 3. 参考 `${CLAUDE_SKILL_DIR}/prompts/merger.md` 分析增量内容
 4. 存档当前版本（用 Bash）：
    ```bash
    cp geezers/{geezer}/SKILL.md geezers/{geezer}/versions/SKILL_$(date +%Y%m%d_%H%M%S).md
    ```
-5. 用 `Edit` 工具追加增量内容到对应文件
-6. 重新生成 `SKILL.md`（合并最新 rhetoric.md + style.md）
-7. 更新 `meta.json` 的 version 和 updated_at
+5. 用 `Edit` 工具追加增量内容到对应文件（cognition.md、rhetoric.md、style.md）
+6. 重新生成 `SKILL.md`（合并最新 cognition.md + rhetoric.md + style.md）
+7. 运行 `validator.py` 验证合并质量
+8. 更新 `meta.json` 的 version、updated_at、auto_weights
 
 ---
 
@@ -339,7 +419,7 @@ user-invocable: true
 用户表达"不对"/"ta不会这样说"/"ta应该更XXX"时：
 
 1. 参考 `${CLAUDE_SKILL_DIR}/prompts/correction_handler.md` 识别纠正内容
-2. 判断属于 Rhetoric（话术/行为）还是 Style（说话方式/语气）
+2. 判断属于 Cognition（思维模式）、Rhetoric（话术/行为）还是 Style（说话方式/语气）
 3. 生成 correction 记录
 4. 用 `Edit` 工具追加到对应文件的 `## Correction 记录` 节
 5. 重新生成 `SKILL.md`
@@ -403,3 +483,13 @@ user-invocable: true
 | 不懂装懂 | `references/bluffing.md` | 假装听过、模糊带过、降维回避 |
 | 社交表演 | `references/social_performance.md` | 人脉炫耀、当年勇、点评一切 |
 | 情绪边界 | `references/emotional_range.md` | 情绪光谱、面子系统、粗口规则 |
+| 认知模式 | `references/cognitive_patterns.md` | 世界观模板、决策模式、认知偏见 |
+
+## 分析工具
+
+| 工具 | 文件 | 说明 |
+|------|------|------|
+| 语料解析 | `tools/source_parser.py` | 多格式转写文件解析 |
+| 特征提取 | `tools/feature_extractor.py` | 自动提取语气词/行为标记/权重/原型 |
+| 标记词库 | `tools/dimension_markers.json` | 8 维行为标记词 + 归一化阈值 |
+| 质量验证 | `tools/validator.py` | 对比统计数据和生成结果的保真度 |

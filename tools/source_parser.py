@@ -18,7 +18,109 @@ import json
 import os
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
+
+
+SYSTEM_SPEAKERS = {"系统消息", "系统", "system", "wechat system"}
+LOW_SIGNAL_CONTENT = {
+    "收到", "好的", "嗯", "哦", "ok", "OK", "1", "好", "在", "👌", "收到。",
+}
+
+
+def normalize_speaker_name(raw_name: str) -> str:
+    if not raw_name:
+        return ""
+
+    speaker = raw_name.strip().lstrip("@")
+    speaker = speaker.replace("\u3000", " ")
+    speaker = re.sub(r"\s+", " ", speaker)
+    speaker = re.sub(r"[\(（][^()（）]{1,20}[\)）]\s*$", "", speaker).strip()
+    speaker = re.sub(r"^\[[^\[\]]+\]\s*", "", speaker).strip()
+    return speaker
+
+
+def clean_content(text: str) -> str:
+    if not text:
+        return ""
+
+    cleaned = text.replace("\r\n", "\n").replace("\r", "\n").strip()
+    cleaned = re.sub(r"^引用[:：].*$", "", cleaned, flags=re.MULTILINE)
+    cleaned = re.sub(r"^\[图片\]$", "", cleaned, flags=re.MULTILINE)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
+
+
+def _parse_timestamp(timestamp: str) -> datetime | None:
+    if not timestamp:
+        return None
+
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y/%m/%d %H:%M:%S"):
+        try:
+            return datetime.strptime(timestamp.strip(), fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def is_noise_utterance(speaker: str, content: str) -> bool:
+    normalized_speaker = speaker.lower().strip()
+    normalized_content = content.strip()
+
+    if normalized_speaker in {s.lower() for s in SYSTEM_SPEAKERS}:
+        return True
+    if "撤回了一条消息" in normalized_content:
+        return True
+    if normalized_content in LOW_SIGNAL_CONTENT:
+        return True
+    return False
+
+
+def preprocess_utterances(utterances: list[dict], merge_gap_seconds: int = 30) -> list[dict]:
+    """标准化 speaker/content，并合并连续短间隔发言。"""
+    cleaned = []
+
+    for utterance in utterances:
+        speaker = normalize_speaker_name(str(utterance.get("speaker", "")))
+        content = clean_content(str(utterance.get("content", "")))
+        timestamp = str(utterance.get("timestamp", "")).strip()
+
+        if not speaker or not content:
+            continue
+        if is_noise_utterance(speaker, content):
+            continue
+
+        current = {
+            "speaker": speaker,
+            "timestamp": timestamp,
+            "content": content,
+        }
+
+        if not cleaned:
+            cleaned.append(current)
+            continue
+
+        previous = cleaned[-1]
+        if previous["speaker"] != current["speaker"]:
+            cleaned.append(current)
+            continue
+
+        prev_dt = _parse_timestamp(previous.get("timestamp", ""))
+        curr_dt = _parse_timestamp(current.get("timestamp", ""))
+        within_gap = False
+        if prev_dt and curr_dt:
+            within_gap = (curr_dt - prev_dt).total_seconds() <= merge_gap_seconds
+        elif not prev_dt or not curr_dt:
+            within_gap = True
+
+        if within_gap:
+            previous["content"] = f"{previous['content']}\n{current['content']}".strip()
+            if not previous.get("timestamp"):
+                previous["timestamp"] = current["timestamp"]
+        else:
+            cleaned.append(current)
+
+    return cleaned
 
 
 def parse_tencent_meeting(file_path: str, target_speakers: list[str] | None = None) -> list[dict]:
@@ -250,6 +352,8 @@ def main():
             continue
         utterances = auto_parse(fp, target_speakers=args.speakers)
         all_utterances.extend(utterances)
+
+    all_utterances = preprocess_utterances(all_utterances)
 
     if args.format == "json":
         output = json.dumps(all_utterances, ensure_ascii=False, indent=2)

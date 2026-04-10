@@ -24,10 +24,11 @@
 | 语气调整 | style.md | "ta说话没这么正式，更糙一点" |
 | 情绪调整 | style.md | "ta被反驳不会发火，会冷笑" |
 | 强度调整 | meta.json | "太温和了" → 提高相关维度权重 |
+| 思维模式调整 | cognition.md | "ta不是因为经验才这么说，ta是因为看不起新东西" |
 
 ## 处理流程
 
-1. **识别纠正维度**：用户在纠正什么？话术？风格？强度？
+1. **识别纠正维度**：用户在纠正什么？话术？风格？强度？认知？
 2. **提取修正内容**：用户期望的行为是什么？
 3. **生成 correction 记录**：
 
@@ -35,13 +36,13 @@
 ## Correction #{n} - {日期}
 
 - 触发：用户说 "{原文}"
-- 维度：{rhetoric/style/weight}
+- 维度：{rhetoric/style/weight/cognition}
 - 原始：{原来的设定}
 - 修正：{新的设定}
 - 原因：{用户的描述}
 ```
 
-4. **写入对应文件**：追加到 rhetoric.md 或 style.md 的 `## Correction 记录` 节
+4. **写入对应文件**：追加到 rhetoric.md、style.md 或 cognition.md 的 `## Correction 记录` 节
 5. **更新 meta.json**：`corrections_count += 1`
 6. **重新生成 SKILL.md**
 7. **立即用修正后的风格重新回应**，让用户验证
@@ -55,3 +56,7 @@
 如果纠正与原材料冲突：
 - 纠正优先（用户的主观判断 > 机器分析）
 - 保留原材料分析结果作为参考
+
+如果纠正与统计数据冲突：
+- 将该维度从 auto_weights 移至 manual_weights
+- 记录"用户纠正覆盖了统计推断"
